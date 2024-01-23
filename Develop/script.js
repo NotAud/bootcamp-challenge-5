@@ -54,7 +54,7 @@ $(function () {
     const timeBlock = $("<div>", {
       class: `row time-block ${pastPresentFuture}`,
       id: `hour-${blockHour}`,
-    }).data("entry", i);
+    });
 
     // Create hour element
     const hour = $("<div>", {
