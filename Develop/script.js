@@ -95,10 +95,15 @@ $(function () {
     const text = $(this).siblings(".description").val();
 
     // Check if text is empty
-    if (!text) return;
-
-    // Update the schedule
-    schedule.timeline[entry] = text;
+    if (text == "") {
+      if (schedule.timeline[entry]) {
+        // Remove entry from schedule
+        delete schedule.timeline[entry];
+      }
+    } else {
+      // Update the schedule
+      schedule.timeline[entry] = text;
+    }
 
     // Save / Update the schedule to local storage
     localStorage.setItem("schedule", JSON.stringify(schedule));
