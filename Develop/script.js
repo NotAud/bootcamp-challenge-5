@@ -1,9 +1,25 @@
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
+
+// Create a date object to be used throughout app
+const currentDate = new Date();
+
 $(function () {
-  // Create a date object to be used throughout app
-  const currentDate = new Date();
+  // Initialize local storage
+  let schedule = JSON.parse(localStorage.getItem("schedule"));
+
+  // Check if schedule doesn't exist or if it's a new day
+  // Nullish Coallescing -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator
+  // Schedule can be undefined, this avoids an extra if check before calling isSameDay (More readable)
+  if (!schedule) {
+    schedule = resetStorageState();
+  }
+
+  const newDay = !isSameDay(currentDate, new Date(schedule.lastUpdated));
+  if (newDay) {
+    schedule = resetStorageState();
+  }
 
   // Not important for this project, but set a variable for our start and end time
   // Based on 24hr time
@@ -34,6 +50,7 @@ $(function () {
         : "present";
 
     // Create timeblock element
+    const timeId = `hour-${blockHour}`;
     const timeBlock = $("<div>", {
       class: `row time-block ${pastPresentFuture}`,
       id: `hour-${blockHour}`,
@@ -50,6 +67,11 @@ $(function () {
       rows: "3",
     });
 
+    // Check if there is a saved entry for this timeblock
+    if (schedule.timeline[timeId]) {
+      textArea.val(schedule.timeline[timeId]);
+    }
+
     // Create save button element
     const saveBtn = $("<button>", {
       class: "btn saveBtn col-2 col-md-1",
@@ -65,8 +87,21 @@ $(function () {
   // time-block containing the button that was clicked? How might the id be
   // useful when saving the description in local storage?
 
-  $("#target").on("click", function () {
-    alert("Handler for `click` called.");
+  $(".saveBtn").on("click", function () {
+    // Get the entry number from the timeblock id
+    const entry = $(this).closest(".time-block").attr("id");
+
+    // Get the text value from the textarea
+    const text = $(this).siblings(".description").val();
+
+    // Check if text is empty
+    if (!text) return;
+
+    // Update the schedule
+    schedule.timeline[entry] = text;
+
+    // Save / Update the schedule to local storage
+    localStorage.setItem("schedule", JSON.stringify(schedule));
   });
 
   // TODO: Add code to apply the past, present, or future class to each time
@@ -92,6 +127,21 @@ $(function () {
   $("#currentDay").text(formattedDate);
 });
 
+// Helper to reset storage and return the default / reset state
+function resetStorageState() {
+  // Set a default state for schedule
+  localStorage.setItem(
+    "schedule",
+    JSON.stringify({
+      timeline: {},
+      lastUpdated: currentDate.toISOString(),
+    })
+  );
+
+  // Get updated schedule state
+  return JSON.parse(localStorage.getItem("schedule"));
+}
+
 // Helper function to convert 24hr time to standard time
 function convertHoursToStandard(hour) {
   if (hour <= 12) {
@@ -99,4 +149,14 @@ function convertHoursToStandard(hour) {
   } else if (hour >= 12) {
     return hour - 12;
   }
+}
+
+// Helper function to check if two dates are the same day
+function isSameDay(date1, date2) {
+  // Verify that year, month, and day are ALL the same values
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
 }
