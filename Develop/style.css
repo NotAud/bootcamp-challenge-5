@@ -57,3 +57,11 @@ textarea {
   font-size: 20px;
   transition: all 0.3s ease-in-out;
 }
+
+.saved-text {
+  display: hidden;
+}
+
+.fa-check {
+  color: rgb(130, 212, 130);
+}
