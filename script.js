@@ -3,7 +3,6 @@
 // in the html.
 
 // Create a date object to be used throughout app
-// const currentDate = new Date();
 const currentDate = dayjs();
 
 $(function () {
