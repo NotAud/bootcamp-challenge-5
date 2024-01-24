@@ -3,7 +3,8 @@
 // in the html.
 
 // Create a date object to be used throughout app
-const currentDate = new Date();
+// const currentDate = new Date();
+const currentDate = dayjs();
 
 $(function () {
   // Initialize local storage
@@ -15,8 +16,8 @@ $(function () {
   }
 
   // Verify the day is still current, if not reset the schedule
-  const newDay = !isSameDay(currentDate, new Date(schedule.lastUpdated));
-  if (newDay) {
+  const isNewDay = !currentDate.isSame(schedule.lastUpdated, "day");
+  if (isNewDay) {
     schedule = resetStorageState();
   }
 
@@ -40,7 +41,7 @@ $(function () {
     const amPm = blockHour < 12 ? "AM" : "PM";
 
     // Determine past, present, future
-    const currentHour = currentDate.getHours();
+    const currentHour = currentDate.hour();
 
     // Ternary chain to determine past, present, future (Determines styling)
     const pastPresentFuture =
@@ -112,11 +113,7 @@ $(function () {
 
   // Format date object to display expected output (based on locale)
   // Reuse our date object
-  const formattedDate = currentDate.toLocaleDateString("default", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
+  const formattedDate = currentDate.format("dddd, MMMM D");
 
   // Use Jquery to set in DOM
   $("#currentDay").text(formattedDate);
@@ -144,14 +141,4 @@ function convertHoursToStandard(hour) {
   } else if (hour >= 12) {
     return hour - 12;
   }
-}
-
-// Helper function to check if two dates are the same day
-function isSameDay(date1, date2) {
-  // Verify that year, month, and day are ALL the same values
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
-  );
 }
