@@ -9,13 +9,12 @@ $(function () {
   // Initialize local storage
   let schedule = JSON.parse(localStorage.getItem("schedule"));
 
-  // Check if schedule doesn't exist or if it's a new day
-  // Nullish Coallescing -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_operator
   // Schedule can be undefined, this avoids an extra if check before calling isSameDay (More readable)
   if (!schedule) {
     schedule = resetStorageState();
   }
 
+  // Verify the day is still current, if not reset the schedule
   const newDay = !isSameDay(currentDate, new Date(schedule.lastUpdated));
   if (newDay) {
     schedule = resetStorageState();
@@ -33,6 +32,8 @@ $(function () {
   for (let i = 0; i <= workHours; i++) {
     // Convert index to start at 1 for a more standard time format
     const blockHour = i + startTime;
+
+    // Convert 24hr time to standard time for display
     const standardHour = convertHoursToStandard(blockHour);
 
     // Ternary for AM / PM
